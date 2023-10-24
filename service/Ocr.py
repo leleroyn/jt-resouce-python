@@ -1,4 +1,6 @@
 import cv2
+import numpy as np
+from PIL import ImageOps, Image
 from rapidocr_onnxruntime import RapidOCR
 
 

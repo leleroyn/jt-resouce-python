@@ -1,13 +1,12 @@
+from typing import List, Dict, Any
+from fastapi import FastAPI, UploadFile, File, Response
 from time import time
-from typing import Dict, Any
+from service.ImageUtil import *
+from service.PdfUtils import *
+from service.Ocr import Ocr
+from model.OcrResponse import OcrResponse
 
 from fastapi import APIRouter
-from fastapi import UploadFile, File, Response
-
-from model.OcrResponse import OcrResponse
-from service.ImageUtil import *
-from service.Ocr import Ocr
-from service.PdfUtils import *
 
 app = APIRouter()
 
