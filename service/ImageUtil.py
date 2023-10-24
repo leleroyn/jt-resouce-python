@@ -1,8 +1,9 @@
+import base64
+from io import BytesIO
+
 import cv2
 import numpy as np
 from PIL import ImageOps, Image
-from io import BytesIO
-import base64
 
 
 def pil2cv(image):
@@ -134,4 +135,9 @@ def image_to_base64(image: Image.Image, fmt='png') -> str:
     image.save(output_buffer, format=fmt)
     byte_data = output_buffer.getvalue()
     base64_str = base64.b64encode(byte_data).decode('utf-8')
+    return base64_str
+
+
+def bytes_to_base64(bits) -> str:
+    base64_str = base64.b64encode(bits).decode('utf-8')
     return base64_str

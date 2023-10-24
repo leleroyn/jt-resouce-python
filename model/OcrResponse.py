@@ -1,11 +1,12 @@
 from copy import deepcopy
-from typing import List, Dict, Any
+from typing import List
+
 from pydantic import BaseModel
 
 
 class OcrResponse(BaseModel):
     status_code: int = 200
-    results: List[Dict[str, Any]]
+    results: List
 
     def dict(self, **kwargs):
         the_dict = deepcopy(super().dict())

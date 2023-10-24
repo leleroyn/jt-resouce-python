@@ -1,11 +1,14 @@
-from typing import List, Dict, Any
-from fastapi import FastAPI, UploadFile, File, Response
 from time import time
-from service.imageUtil import *
-from service.Ocr import Ocr
-from model.OcrResponse import OcrResponse
+from typing import Dict, Any
 
 from fastapi import APIRouter
+from fastapi import UploadFile, File, Response
+
+from model.OcrResponse import OcrResponse
+from service.ImageUtil import *
+from service.Ocr import Ocr
+from service.PdfUtils import *
+
 app = APIRouter()
 
 
@@ -29,13 +32,26 @@ async def ocr(image: UploadFile) -> Dict[str, Any]:
 
 
 @app.post("/get_stamp")
-async def get_stamp(image: UploadFile = File(...)):
-    resp_str = ''
-    image = image.file
-    image = Image.open(image).convert('RGB')
+async def get_stamp(image: List[UploadFile] = File(...)):
+    img_list = []
+    for img in image:
+        img_list.append(get_stamp_single(Image.open(img.file).convert('RGB')))
+    big_img = cv2.hconcat(img_list)
+    resp_str = image_to_base64(cv2pil(big_img))
+    return Response(content=resp_str, media_type="text/plain")
+
+
+@app.post("/convent_pdf_to_image")
+async def convent_pdf_to_image(file: UploadFile):
+    res = []
+    images = convent_page_to_image(file.file.read())
+    for bits in images:
+        res.append(bytes_to_base64(bits))
+    return res
+
+
+def get_stamp_single(image):
     image = rotate_image_by_exif(image)
     cv_img = pil2cv(image)
-    if check_seal_exit(cv_img) != 0:
-        out_img = pick_seal_image(cv_img)
-        resp_str = image_to_base64(cv2pil(out_img))
-    return Response(content=resp_str, media_type="text/plain")
+    out_img = pick_seal_image(cv_img)
+    return out_img

@@ -1,6 +1,4 @@
 import cv2
-import numpy as np
-from PIL import ImageOps, Image
 from rapidocr_onnxruntime import RapidOCR
 
 
@@ -17,9 +15,6 @@ class Ocr:
         if res is not None:
             results = []
             for i in range(len(res)):
-                item = {}
-                item["position"] = res[i][0]
-                item["text"] = res[i][1]
-                item["score"] = res[i][2]
+                item = {"position": res[i][0], "text": res[i][1], "score": res[i][2]}
                 results.append(item)
         return results
