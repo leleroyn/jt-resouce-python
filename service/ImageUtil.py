@@ -1,9 +1,11 @@
 import base64
 from io import BytesIO
+from math import fabs, sin, radians, cos
 
 import cv2
 import numpy as np
 from PIL import ImageOps, Image
+from rapid_orientation import RapidOrientation
 
 
 def pil2cv(image):
@@ -141,3 +143,35 @@ def image_to_base64(image: Image.Image, fmt='png') -> str:
 def bytes_to_base64(bits) -> str:
     base64_str = base64.b64encode(bits).decode('utf-8')
     return base64_str
+
+
+def rotate_bound(image, angle):
+    """
+     . 旋转图片
+     . @param image    opencv读取后的图像
+     . @param angle    (逆)旋转角度
+    """
+
+    h, w = image.shape[:2]  # 返回(高,宽,色彩通道数),此处取前两个值返回
+    newW = int(h * fabs(sin(radians(angle))) + w * fabs(cos(radians(angle))))
+    newH = int(w * fabs(sin(radians(angle))) + h * fabs(cos(radians(angle))))
+    M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1)
+    M[0, 2] += (newW - w) / 2
+    M[1, 2] += (newH - h) / 2
+    return cv2.warpAffine(image, M, (newW, newH), borderValue=(255, 255, 255))
+
+
+def orientation(image_cv):
+    """
+    对含有文字信息的文档图像进行旋转
+    :param image_cv: cv 图像
+    :return: 处理完的正常方向图像
+    """
+    orientation_engine = RapidOrientation()
+    orientation_res, elapse = orientation_engine(image_cv)
+    print(orientation_res)
+    angle = int(orientation_res)
+    if angle > 0:
+        return rotate_bound(image_cv, angle)
+    else:
+        return image_cv

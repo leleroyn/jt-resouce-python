@@ -21,7 +21,6 @@ async def ocr(image: UploadFile) -> Dict[str, Any]:
     start = time()
     image = image.file
     image = Image.open(image).convert('RGB')
-    image = rotate_image_by_exif(image)
     image = pil2cv(image)
     res = Ocr().detect(image)
     end = time()
