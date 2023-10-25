@@ -1,12 +1,13 @@
-from typing import List, Dict, Any
-from fastapi import FastAPI, UploadFile, File, Response
 from time import time
-from service.ImageUtil import *
-from service.PdfUtils import *
-from service.Ocr import Ocr
-from model.OcrResponse import OcrResponse
+from typing import Dict, Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Form
+from fastapi import UploadFile, File, Response
+
+from model.OcrResponse import OcrResponse
+from service.ImageUtil import *
+from service.Ocr import Ocr
+from service.PdfUtils import *
 
 app = APIRouter()
 
@@ -46,6 +47,33 @@ async def convent_pdf_to_image(file: UploadFile):
     for bits in images:
         res.append(bytes_to_base64(bits))
     return res
+
+
+@app.post("/adjust_image_position")
+async def adjust_image_position(image: UploadFile, algorithm: str = Form(default="3")):
+    """
+    调整图像位置到正确的方向
+    :param image:
+    :param algorithm:
+    :return:
+    """
+    image = image.file
+    image = Image.open(image).convert('RGB')
+    angle = 0
+    if algorithm == "1":
+        image = rotate_image_by_exif(image)
+        return angle, image_to_base64(image)
+    elif algorithm == "2":
+        image = pil2cv(image)
+        angle, image = orientation(image)
+        image = cv2pil(image)
+        return angle, image_to_base64(image)
+    else:
+        image = rotate_image_by_exif(image)
+        image = pil2cv(image)
+        angle, image = orientation(image)
+        image = cv2pil(image)
+        return angle, image_to_base64(image)
 
 
 def get_stamp_single(image):

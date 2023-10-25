@@ -31,11 +31,6 @@ def cv2pil(image):
     return new_image
 
 
-def rotate_image_by_exif(image_pil):
-    image_pil = ImageOps.exif_transpose(image_pil)
-    return image_pil
-
-
 # 判别图片中是否存在红色印章（只能判别红色印章）
 def check_seal_exit(img):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
@@ -132,9 +127,9 @@ def pick_seal_image(image):
     return all_stamp
 
 
-def image_to_base64(image: Image.Image, fmt='png') -> str:
+def image_to_base64(image_pil: Image.Image, fmt='png') -> str:
     output_buffer = BytesIO()
-    image.save(output_buffer, format=fmt)
+    image_pil.save(output_buffer, format=fmt)
     byte_data = output_buffer.getvalue()
     base64_str = base64.b64encode(byte_data).decode('utf-8')
     return base64_str
@@ -172,6 +167,16 @@ def orientation(image_cv):
     print(orientation_res)
     angle = int(orientation_res)
     if angle > 0:
-        return rotate_bound(image_cv, angle)
+        return (angle,rotate_bound(image_cv, angle))
     else:
-        return image_cv
+        return (0,image_cv)
+
+
+def rotate_image_by_exif(image_pil):
+    """
+    根据图像中的相机机位信息自动旋转图像
+    :param image_pil:
+    :return:
+    """
+    image_pil = ImageOps.exif_transpose(image_pil)
+    return image_pil
