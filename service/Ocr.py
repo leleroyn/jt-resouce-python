@@ -1,7 +1,7 @@
 import cv2
 from rapidocr_onnxruntime import RapidOCR
 
-from service import orientation
+from service.ImageUtil import orientation
 
 
 class Ocr:
