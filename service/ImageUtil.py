@@ -167,9 +167,9 @@ def orientation(image_cv):
     print(orientation_res)
     angle = int(orientation_res)
     if angle > 0:
-        return (angle,rotate_bound(image_cv, angle))
+        return (angle, rotate_bound(image_cv, angle))
     else:
-        return (0,image_cv)
+        return (0, image_cv)
 
 
 def rotate_image_by_exif(image_pil):
@@ -180,3 +180,26 @@ def rotate_image_by_exif(image_pil):
     """
     image_pil = ImageOps.exif_transpose(image_pil)
     return image_pil
+
+
+def mask_text_on_bottom(text: str, img_cv, color=(0, 0, 255)):
+    """
+    在图像的左下方打上文字
+    :param color: 文字的RGB值
+    :param text: 要打印的文字
+    :param img_cv:
+    :return:
+    """
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    org = 10, img_cv.shape[0] - 10
+    fontScale = 0.5
+    color = color  # BGR格式的蓝色
+    thickness = 2
+    cv2.putText(img_cv, text, org, font, fontScale, color, thickness)
+
+
+if __name__ == '__main__':
+    img = cv2.imread("F:\\idcard.jpg")
+    mask_text_on_bottom("2", img)
+    cv2.imshow("test", img)
+    cv2.waitKey()

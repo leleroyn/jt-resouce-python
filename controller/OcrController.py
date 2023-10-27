@@ -41,11 +41,24 @@ async def get_stamp(image: List[UploadFile] = File(...)):
 
 
 @app.post("/convent_pdf_to_image")
-async def convent_pdf_to_image(file: UploadFile):
+async def convent_pdf_to_image(file: UploadFile, merge: str = Form(default="0")):
     res = []
     images = convent_page_to_image(file.file.read())
-    for bits in images:
-        res.append(bytes_to_base64(bits))
+    for i in range(len(images)):
+        cur_img = Image.open(BytesIO(images[i]))
+        cur_img = pil2cv(cur_img)
+        if merge == "1":
+            if i > 0:
+                merge_img = cv2.hconcat(cur_img)
+            else:
+                merge_img = cur_img
+            mask_text_on_bottom(str(i + 1) + "/" + str(len(images)), merge_img, (0, 0, 0))
+            merge_img = cv2pil(merge_img)
+            res.append(image_to_base64(merge_img))
+        else:
+            mask_text_on_bottom(str(i + 1) + "/" + str(len(images)), cur_img, (0, 0, 0))
+            cur_img = cv2pil(cur_img)
+            res.append(image_to_base64(cur_img))
     return res
 
 
