@@ -2,8 +2,7 @@ from typing import List
 
 import cv2
 from PIL import Image
-from fastapi import APIRouter, UploadFile, Form, File
-from fastapi.openapi.models import Response
+from fastapi import APIRouter, UploadFile, Form, File, Response
 
 from service import rotate_image_by_exif, pil2cv, pick_seal_image, image_to_base64, orientation, cv2pil
 

@@ -3,9 +3,10 @@ from io import BytesIO
 import cv2
 import numpy as np
 from PIL import Image
-from fastapi import APIRouter, UploadFile, Form
+from fastapi import APIRouter, UploadFile, Form, Response
 
-from service import convent_page_to_image, pil2cv, mask_text_on_bottom, cv2pil, image_to_base64
+from service import convent_page_to_image, pil2cv, mask_text_on_bottom, cv2pil, image_to_base64, pdf_to_pic, pic_to_pdf, \
+    bytes_to_base64
 
 app = APIRouter()
 
@@ -48,3 +49,27 @@ async def convent_pdf_to_image(file: UploadFile, merge: str = Form(default="0"))
             cur_img = cv2pil(cur_img)
             res.append(image_to_base64(cur_img))
         return res
+
+
+@app.post("/compress_pdf")
+async def compress_pdf(file: UploadFile, size: str = Form(default="10")):
+    """
+    压缩文件到指定大小
+    :param file: 上传的pdf文件
+    :param size: 要压缩到的文件大小
+    :return: 压缩后文件的base64内容
+    """
+    file_bites = file.file.read()
+    file_size = len(file_bites)
+    compress_size = int(size)
+    ratio = 80
+    ret_pdf_bits = None
+    while compress_size * 1024 * 1024 < file_size:
+        pics = pdf_to_pic(file_bites, ratio)
+        ret_pdf_bits = pic_to_pdf(pics)
+        file_size = len(ret_pdf_bits)
+        ratio = ratio - 10
+    if ret_pdf_bits is None:
+        return Response(status_code=500, content="size 的大小必须要小于上传文件的大小。", media_type="text/plain")
+    else:
+        return Response(status_code=200, content=bytes_to_base64(ret_pdf_bits), media_type="text/plain")
