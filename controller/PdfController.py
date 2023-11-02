@@ -69,7 +69,11 @@ async def compress_pdf(file: UploadFile, size: str = Form(default="10")):
         ret_pdf_bits = pic_to_pdf(pics)
         file_size = len(ret_pdf_bits)
         ratio = ratio - 10
+        if ratio == 0:
+            return Response(status_code=500, content=f"无法压缩到指定size:{size}", media_type="text/plain")
+
     if ret_pdf_bits is None:
-        return Response(status_code=500, content="size 的大小必须要小于上传文件的大小。", media_type="text/plain")
+        return Response(status_code=500, content=f"size{size} 的大小必须要小于上传文件的大小{file_size}。",
+                        media_type="text/plain")
     else:
         return Response(status_code=200, content=bytes_to_base64(ret_pdf_bits), media_type="text/plain")
