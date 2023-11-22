@@ -114,6 +114,10 @@ def pick_seal_image(image):
     for item in areas[:4]:
         max_ares = item
         x, y, w, h = cv2.boundingRect(contours[max_ares[1]])
+        x = x - 10
+        y = y - 10
+        w = w + 20
+        h = h + 20
         temp = img5png[y:(y + h), x:(x + w)]
         if temp.shape[0] < temp.shape[1]:
             zh = int((temp.shape[1] - temp.shape[0]) / 2)
