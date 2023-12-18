@@ -11,13 +11,26 @@ from service.Ocr import Ocr
 app = APIRouter()
 
 
+@app.post("/ocr/v2")
+async def ocr(image: UploadFile) -> Dict[str, Any]:
+    start = time()
+    image = image.file
+    image = Image.open(image).convert('RGB')
+    image = pil2cv(image)
+    res = Ocr().detect_ppocr(image)
+    end = time()
+    elapsed = end - start
+    print('Elapsed time is %f seconds.' % elapsed)
+    return OcrResponse(results=res).dict()
+
+
 @app.post("/ocr")
 async def ocr(image: UploadFile) -> Dict[str, Any]:
     start = time()
     image = image.file
     image = Image.open(image).convert('RGB')
     image = pil2cv(image)
-    res = Ocr().detect(image)
+    res = Ocr().detect_ort(image)
     end = time()
     elapsed = end - start
     print('Elapsed time is %f seconds.' % elapsed)

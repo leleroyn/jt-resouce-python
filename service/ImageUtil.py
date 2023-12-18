@@ -64,8 +64,8 @@ def pick_seal_image(image):
     hue_image = cv2.cvtColor(img_png, cv2.COLOR_BGR2HSV)
 
     img_real = None
-    mask_ranges = [[np.array([0, 43, 46]), np.array([10, 255, 255])]
-        , [np.array([156, 43, 46]), np.array([180, 255, 255])]]
+    mask_ranges = [[np.array([0, 26, 46]), np.array([10, 255, 255])]
+        , [np.array([156, 26, 46]), np.array([180, 255, 255])]]
     for img_range in mask_ranges:
         th = cv2.inRange(hue_image, img_range[0], img_range[1])
         element = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 1))
@@ -111,7 +111,7 @@ def pick_seal_image(image):
     areas = sorted(areas, reverse=True)
     print(areas)
     stamps = []
-    for item in areas[:4]:
+    for item in areas[:6]:
         max_ares = item
         x, y, w, h = cv2.boundingRect(contours[max_ares[1]])
         x = x - 10
