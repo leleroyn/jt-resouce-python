@@ -37,6 +37,7 @@ class Ocr:
         if res is not None:
             results = []
             for i in range(len(res)):
+                print(res[i][1])
                 item = {"position": res[i][0], "text": res[i][1], "score": res[i][2]}
                 results.append(item)
         return results
