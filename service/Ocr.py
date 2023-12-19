@@ -1,19 +1,18 @@
 import cv2
 from paddleocr import PaddleOCR
 from rapidocr_onnxruntime import RapidOCR
-
 from service.ImageUtil import orientation
 
 
 class Ocr:
-    def detect_ppocr(self, image):
+    @staticmethod
+    def detect_ppocr(image):
         img_w = 1024 if image.shape[1] > 1024 else image.shape[1]
         image = cv2.resize(image, (img_w, int(img_w * image.shape[0] / image.shape[1])),
                            interpolation=cv2.INTER_AREA)
         angle, image = orientation(image)
-        B_channel, G_channel, R_channel = cv2.split(image)
         ocr = PaddleOCR(use_angle_cls=True, lang="ch")
-        result = ocr.ocr(R_channel, cls=True)
+        result = ocr.ocr(image, cls=True)
         if result is not None:
             results = []
             for idx in range(len(result)):
@@ -24,7 +23,8 @@ class Ocr:
                     results.append(item)
         return results
 
-    def detect_ort(self, image):
+    @staticmethod
+    def detect_ort(image):
         img_w = 1024 if image.shape[1] > 1024 else image.shape[1]
         image = cv2.resize(image, (img_w, int(img_w * image.shape[0] / image.shape[1])),
                            interpolation=cv2.INTER_AREA)
@@ -32,9 +32,8 @@ class Ocr:
         image = cv2.resize(image, (img_w, int(img_w * image.shape[0] / image.shape[1])),
                            interpolation=cv2.INTER_AREA)
         angle, image = orientation(image)
-        B_channel, G_channel, R_channel = cv2.split(image)
         rapid_ocr = RapidOCR()
-        res, elapse = rapid_ocr(R_channel)
+        res, elapse = rapid_ocr(image)
         if res is not None:
             results = []
             for i in range(len(res)):
