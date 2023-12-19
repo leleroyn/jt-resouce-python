@@ -33,7 +33,7 @@ class Ocr:
                            interpolation=cv2.INTER_AREA)
         angle, image = orientation(image)
         rapid_ocr = RapidOCR()
-        res, elapse = rapid_ocr(image)
+        res, elapse = rapid_ocr(image,unclip_ratio=1.9)
         if res is not None:
             results = []
             for i in range(len(res)):
