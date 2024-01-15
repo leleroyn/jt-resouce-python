@@ -24,11 +24,12 @@ async def convent_pdf_to_image(file: UploadFile, merge: str = Form(default="0"))
     images = convent_page_to_image(file.file.read())
     merge = int(merge)
     top_img = pil2cv(Image.open(BytesIO(images[0])))
-    dsize = (top_img.shape[1], top_img.shape[0])
+    resize_w = 1920 if top_img.shape[1] > 1920 else top_img.shape[1]
+    dsize = (resize_w, int(resize_w * top_img.shape[0] / top_img.shape[1]))
     for i in range(len(images)):
         cur_img = Image.open(BytesIO(images[i]))
         cur_img = pil2cv(cur_img)
-        mask_text_on_bottom(str(i + 1) + "/" + str(len(images)), cur_img, (0, 0, 0))
+        # mask_text_on_bottom(str(i + 1) + "/" + str(len(images)), cur_img, (0, 0, 0))
         cur_img = cv2.resize(cur_img, dsize=dsize, fx=1, fy=1, interpolation=cv2.INTER_LINEAR)
         mask_images.append(cur_img)
 
